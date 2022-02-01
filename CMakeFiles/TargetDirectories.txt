@@ -1,0 +1,4 @@
+/home/mchonaker/projects/playhouse/Face-Tracking-Projection-Mapping/CMakeFiles/rebuild_cache.dir
+/home/mchonaker/projects/playhouse/Face-Tracking-Projection-Mapping/CMakeFiles/edit_cache.dir
+/home/mchonaker/projects/playhouse/Face-Tracking-Projection-Mapping/CMakeFiles/bin/tests/OpenCVFaceTrack.dir
+/home/mchonaker/projects/playhouse/Face-Tracking-Projection-Mapping/CMakeFiles/bin/tests/OpenCVInc.dir
