@@ -13,6 +13,7 @@ include_directories( inc )
 # add bin and tests directory
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory bin )
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory bin/tests)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory assets)
 
 
 # Define DNN
@@ -22,11 +23,6 @@ set(FACE_DETECTION_CONFIGURATION
 
 set(FACE_DETECTION_WEIGHTS"${PROJECT_SOURCE_DIR}/assets/res10_300x300_ssd_iter_140000_fp16.caffemodel")
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE 
-FACE_DETECTION_CONFIGURATION="${FACE_DETECTION_CONFIGURATION}")
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE 
-FACE_DETECTION_WEIGHTS="${FACE_DETECTION_WEIGHTS}")
 
 #add debug exeutables
 add_executable( bin/tests/OpenCVInc src/tests/opencv_inc.cpp )
@@ -36,3 +32,7 @@ add_executable( bin/tests/OpenCVFaceTrack src/tests/opencv_facetrack.cpp )
 # Add OpenCV to exeitables
 target_link_libraries(  bin/tests/OpenCVInc ${OpenCV_LIBS} )
 target_link_libraries(  bin/tests/OpenCVFaceTrack ${OpenCV_LIBS} )
+
+# Add models to executables
+target_compile_definitions(bin/tests/OpenCVFaceTrack PRIVATE FACE_DETECTION_CONFIGURATION="${FACE_DETECTION_CONFIGURATION}")
+target_compile_definitions(bin/tests/OpenCVFaceTrack PRIVATE FACE_DETECTION_WEIGHTS="${FACE_DETECTION_WEIGHTS}")
