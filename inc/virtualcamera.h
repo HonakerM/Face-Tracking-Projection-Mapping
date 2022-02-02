@@ -1,2 +1,6 @@
 #pragma once
-#include "Dshow.h"
+
+
+#include <vcam/Filters.h>
+
+void test_virtual_cam();

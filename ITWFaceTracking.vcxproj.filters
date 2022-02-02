@@ -16,6 +16,12 @@
     <Filter Include="Source Files\test">
       <UniqueIdentifier>{9d232762-2768-465b-a70a-569416715290}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\vcam">
+      <UniqueIdentifier>{44b11eae-9c73-4435-b0fc-a06f913c157e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vcam">
+      <UniqueIdentifier>{d1d7b2d1-be5a-4d6d-a04c-4044829dcb84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\facetrack.cpp">
@@ -36,12 +42,15 @@
     <ClCompile Include="src\virtaulcamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="inc\vcam\Dll.cpp">
+      <Filter>Source Files\vcam</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\vcam\Filters.cpp">
+      <Filter>Source Files\vcam</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\facetrack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\test.h">
@@ -49,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="inc\virtualcamera.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\vcam\Filters.h">
+      <Filter>Header Files\vcam</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

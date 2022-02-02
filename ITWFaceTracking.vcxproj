@@ -99,6 +99,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="inc\vcam\Dll.cpp" />
+    <ClCompile Include="inc\vcam\Filters.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\facetrack.cpp" />
     <ClCompile Include="src\tests\opencv_facetrack.cpp" />
@@ -108,8 +110,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\common.h" />
-    <ClInclude Include="inc\facetrack.h" />
     <ClInclude Include="inc\test.h" />
+    <ClInclude Include="inc\vcam\Filters.h" />
     <ClInclude Include="inc\virtualcamera.h" />
   </ItemGroup>
   <ItemGroup>

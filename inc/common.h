@@ -1,6 +1,4 @@
-
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
 // stdio
 #include <stdio.h>
@@ -8,8 +6,3 @@
 
 //string
 #include <string.h>
-
-
-
-
-#endif
