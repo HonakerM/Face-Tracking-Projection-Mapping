@@ -13,21 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Source Files\test">
+      <UniqueIdentifier>{9d232762-2768-465b-a70a-569416715290}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cmakefiles\3.16.3\compileridc\CMakeCCompilerId.c">
+    <ClCompile Include="src\facetrack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cmakefiles\3.16.3\compileridcxx\CMakeCXXCompilerId.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\opencv_util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\tests\opencv_facetrack.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\tests\opencv_inc.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tests\opencv_facetrack_tutorial.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tests\opencv_facetrack.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\virtaulcamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,16 +41,27 @@
     <ClInclude Include="inc\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\opencv_util.h">
+    <ClInclude Include="inc\facetrack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\virtualcamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cmakefiles\3.16.3\CMakeDetermineCompilerABI_C.bin">
+    <None Include="assets\deploy.prototxt">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="cmakefiles\3.16.3\CMakeDetermineCompilerABI_CXX.bin">
+    <None Include="assets\res10_300x300_ssd_iter_140000_fp16.caffemodel">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\example_face.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

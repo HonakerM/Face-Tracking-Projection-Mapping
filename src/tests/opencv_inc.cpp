@@ -1,14 +1,12 @@
-#include "opencv_util.h"
-    
-int main(int argc, char** argv )
+#include "test.h"
+#include <opencv2/dnn.hpp>
+#include <opencv2/opencv.hpp>
+
+int opencv_inc_test(std::string filename)
 {
-    if ( argc != 2 )
-    {
-        printf("usage: FaceTrackImg <Image_Path>\n");
-        return -1;
-    }
+
     cv::Mat image;
-    image = cv::imread( argv[1], 1 );
+    image = cv::imread(filename, 1 );
     if ( !image.data )
     {
         printf("No image data \n");

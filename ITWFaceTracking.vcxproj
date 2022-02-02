@@ -99,19 +99,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cmakefiles\3.16.3\compileridcxx\CMakeCXXCompilerId.cpp" />
-    <ClCompile Include="cmakefiles\3.16.3\compileridc\CMakeCCompilerId.c" />
-    <ClCompile Include="src\opencv_util.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\facetrack.cpp" />
     <ClCompile Include="src\tests\opencv_facetrack.cpp" />
+    <ClCompile Include="src\tests\opencv_facetrack_tutorial.cpp" />
     <ClCompile Include="src\tests\opencv_inc.cpp" />
+    <ClCompile Include="src\virtaulcamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\common.h" />
-    <ClInclude Include="inc\opencv_util.h" />
+    <ClInclude Include="inc\facetrack.h" />
+    <ClInclude Include="inc\test.h" />
+    <ClInclude Include="inc\virtualcamera.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cmakefiles\3.16.3\CMakeDetermineCompilerABI_C.bin" />
-    <None Include="cmakefiles\3.16.3\CMakeDetermineCompilerABI_CXX.bin" />
+    <None Include="assets\deploy.prototxt" />
+    <None Include="assets\res10_300x300_ssd_iter_140000_fp16.caffemodel" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\example_face.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

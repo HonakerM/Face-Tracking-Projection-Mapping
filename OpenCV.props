@@ -5,8 +5,13 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OPENCV_DIR)\..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENCV_DIR)\..\include; inc</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>FACE_DETECTION_CONFIGURATION="assets/deploy.prototxt";FACE_DETECTION_WEIGHTS="assets/res10_300x300_ssd_iter_140000_fp16.caffemodel"</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OPENCV_DIR)\vc15\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world455d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
