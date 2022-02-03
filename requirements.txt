@@ -1,2 +1,4 @@
-#opencv
+#face tracking
 opencv-python~=4.5
+mediapipe==0.8.9
+open3d~=0.14.1
