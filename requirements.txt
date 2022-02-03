@@ -1,0 +1,2 @@
+#opencv
+opencv-python~=4.5
