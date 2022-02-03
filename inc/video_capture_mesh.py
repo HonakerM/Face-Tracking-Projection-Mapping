@@ -38,6 +38,7 @@ with mp_face_mesh.FaceMesh(
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5) as face_mesh:
 
+    inital = True
     while cap.isOpened():
         success, image = cap.read()
         if not success:
@@ -100,13 +101,16 @@ with mp_face_mesh.FaceMesh(
             mesh_refined = mesh
             #mesh_refined = mesh.filter_smooth_simple(number_of_iterations=1)
 
-            text_image = cv2.imread("img/example_texture.jpg")
+            #text_image = cv2.imread("img/example_texture.jpg")
 
             #o3d.visualization.draw_geometries([mesh_refined], mesh_show_back_face=True)
             
-
-            render.scene.add_geometry("MyMeshModel", mesh_refined, mtl)
-
+            if(inital):
+                inital = False
+                render.scene.add_geometry("MyMeshModel", mesh_refined, mtl)
+            else:
+                render.scene.remove_geometry("MyMeshModel")
+                render.scene.add_geometry("MyMeshModel", mesh_refined, mtl)
             ## Optionally set the camera field of view (to zoom in a bit)
             #vertical_field_of_view = 15.0  # between 5 and 90 degrees
             #aspect_ratio = img_width / img_height  # azimuth over elevation

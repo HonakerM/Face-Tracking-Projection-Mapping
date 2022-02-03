@@ -1,4 +1,10 @@
 #face tracking
 opencv-python~=4.5
 mediapipe==0.8.9
+
+#modeling pipeline
 open3d~=0.14.1
+
+#output
+pyvirtualcam~=0.9.0
+

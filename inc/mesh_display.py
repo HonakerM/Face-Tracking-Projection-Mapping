@@ -76,7 +76,6 @@ with mp_face_mesh.FaceMesh(
 
         text_image = cv2.imread("img/example_texture.jpg")
         mesh_refined.textures=[o3d.geometry.Image(text_image)]
-        mesh_refined.triangle_material_ids = o3d.utility.IntVector([0]*len(faces))
 
         o3d.visualization.draw_geometries([mesh_refined], mesh_show_back_face=False)
 
@@ -90,7 +89,7 @@ with mp_face_mesh.FaceMesh(
         # Define a simple unlit Material.
         # (The base color does not replace the arrows' own colors.)
         mtl = o3d.visualization.rendering.MaterialRecord()
-        mtl.base_color = [1.0, 1.0, 1.0, 1.0]  # RGBA
+        mtl.base_color = [1, 0, 0, 1.0]  # RGBA
         mtl.shader = "defaultUnlit"
 
         render.scene.add_geometry("MyMeshModel", mesh_refined, mtl)
@@ -105,7 +104,7 @@ with mp_face_mesh.FaceMesh(
 
         # Look at the origin from the front (along the -Z direction, into the screen), with Y as Up.
         center = [0, 0, 0]  # look_at target
-        eye = [0, 0, 1]  # camera position
+        eye = [1, 0, 1]  # camera position
         up = [0, 1, 0]  # camera orientation
         render.scene.camera.look_at(center, eye, up)
 
@@ -114,6 +113,6 @@ with mp_face_mesh.FaceMesh(
         # Display the image in a separate window
         # (Note: OpenCV expects the color in BGR format, so swop red and blue.)
         img_cv2 = cv2.cvtColor(np.array(img_o3d), cv2.COLOR_RGBA2BGRA)
-        #cv2.imshow("Preview window", img_cv2)
+        cv2.imshow("Preview window", img_cv2)
         cv2.waitKey()
 
