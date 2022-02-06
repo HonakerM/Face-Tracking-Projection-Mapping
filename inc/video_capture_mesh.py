@@ -68,6 +68,8 @@ with mp_face_mesh.FaceMesh(
                 temp_arr.append([res.x, res.y, res.z])
 
             face_mesh_array = np.array(temp_arr)
+            print(np.ndarray.tolist(face_mesh_array))
+            exit(1)
             mesh_x = face_mesh_array[:,0]
             mesh_y = face_mesh_array[:,1]
             mesh_z = face_mesh_array[:,2]
