@@ -127,6 +127,7 @@ class BrownianBlender(ShowBase):
         self.adjust_angle += heading
         self.adjust_pitch += pitch
 
+
     def adjust_loc(self, direction, speed):
         self.camera.set_pos(0, 0, 0)
         

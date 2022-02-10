@@ -3,17 +3,18 @@ from direct.showbase.ShowBase import ShowBase
 from panda3d.core import Geom, GeomNode, GeomVertexFormat, \
     GeomVertexData, GeomTriangles, GeomVertexWriter, GeomVertexReader
 from panda3d.core import NodePath
-from panda3d.core import PointLight
+from panda3d.core import AmbientLight, PointLight, DirectionalLight
 from panda3d.core import VBase4, Vec3
 from direct.task import Task
 import sys
 import random
-from math import sqrt
+from math import sqrt, sin, cos, pi
 from model_data import vertices, faces
 
 
 import cv2
 import mediapipe as mp
+import numpy as np
 
 class BrownianBlender(ShowBase):
     def __init__(self):
@@ -24,19 +25,29 @@ class BrownianBlender(ShowBase):
         self.accept("escape", sys.exit)
         self.camera.set_pos(0.3759736716747284, 0.499371200799942, -1.889259696006775)
         self.camera.setHpr(-16.5869, 82.7357, 30.1287)
-        # A light
-        plight = PointLight('plight')
-        print(plight.setShadowCaster(True, 4096, 4096))
-        plight.setColor(VBase4(0.5, 0.5, 0.5, 1))
-        plnp = self.render.attachNewNode(plight)
-        plnp.setPos(5, 5, 5)
-        plnp.look_at(0.3759736716747284, 0.499371200799942, -1.889259696006775)
-        self.render.setLight(plnp)
+        
+        # Add ambient light
+        ambientLight = AmbientLight('ambientLight')
+        ambientLight.setColor((0.3, 0.3, 0.3, 1))
+        ambientLightNP = self.render.attachNewNode(ambientLight)
+        self.render.setLight(ambientLightNP)
+
+        #plight = DirectionalLight('plight')
+        #plight.setShadowCaster(True, 512, 512)
+        #plight.setColor(VBase4(1, 1, 1, 1))
+        #self.plnp = self.render.attachNewNode(plight)
+        #self.plnp.setPos(0.3759736716747284, 0.499371200799942, -1.889259696006775)
+        #self.plnp.look_at(-16.5869, 82.7357, 30.1287)
+        #self.render.setLight(self.plnp)
+
+
+        #adjust render settings
         self.render.setShaderAuto()
 
         # Create the geometry
         geom = self.create_geom()
         np = NodePath(geom)
+        np.setDepthOffset(1)
         np.reparent_to(self.render)
 
         self.accept("space", self.print_camera, [])
@@ -60,8 +71,16 @@ class BrownianBlender(ShowBase):
         #self.taskMgr.add(self.swap_maps, 'swap_geometry', sort = 5)
         #self.taskMgr.add(self.interpolate_maps, 'interpolate_geometry', sort = 10)
 
-
-        
+        self.yaw = 0
+        self.pitch= 0
+        self.accept("arrow_left", self.adjust_turning, [-1.0, 0.0])
+        self.accept("arrow_right", self.adjust_turning, [1.0, 0.0])
+        self.accept("arrow_up", self.adjust_turning, [0.0, 1.0])
+        self.accept("arrow_down", self.adjust_turning, [0.0, -1.0])
+        self.accept("w", self.adjust_loc, ["forward",1])
+        self.accept("a", self.adjust_loc, ["left",1])
+        self.accept("s", self.adjust_loc, ["backward",1])
+        self.accept("d", self.adjust_loc, ["right",1])
    
     def print_camera(self):
         x = self.camera.getPos().getX()
@@ -123,10 +142,53 @@ class BrownianBlender(ShowBase):
 
         vertex_writer = GeomVertexWriter(self.vdata, 'vertex')
 
+
+        landmark_x = np.array([])
+        landmark_y = np.array([])
+        landmark_z = np.array([])
         for landmark in face_landmarks:
-            vertex_writer.setData3f(landmark.x, landmark.y, landmark.z)
+            landmark_x = np.append(landmark_x, landmark.x)
+            landmark_y = np.append(landmark_y, landmark.y)
+            landmark_z = np.append(landmark_z, landmark.z)
+
+        average_x = np.mean(landmark_x)
+        average_y = np.mean(landmark_y)
+        average_z = np.mean(landmark_z)
+
+        centered_x = landmark_x 
+        centered_y = landmark_y 
+        centered_z = landmark_z 
+
+
+        for i in range(len(centered_x)):
+            vertex_writer.setData3f(centered_x[i], centered_y[i], centered_z[i])
+
 
         return task.cont
+
+    def adjust_loc(self, direction, speed):
+        loc = self.plnp.getPos()
+        print("moving", loc)
+        if(direction == "forward"):
+            loc.addY(speed)
+            self.plnp.setPos(loc)
+        if(direction == "left"):
+            loc.addX(speed)
+            self.plnp.setPos(loc)
+        if(direction == "backward"):
+            loc.addY(-1*speed)
+            self.plnp.setPos(loc)
+        if(direction == "right"):
+            loc.addX(-1*speed)
+            self.plnp.setPos(loc)
+
+    def adjust_turning(self, yaw, pitch):
+        self.yaw += yaw
+        self.pitch += pitch
+
+        print(self.yaw,self.pitch )
+
+        self.plnp.setHpr(self.yaw,self.pitch,0)
 
 demo = BrownianBlender()
 demo.run()
