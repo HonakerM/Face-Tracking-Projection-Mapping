@@ -23,8 +23,9 @@ class BrownianBlender(ShowBase):
         base.disableMouse()
         base.setFrameRateMeter(True)
         self.accept("escape", sys.exit)
-        self.camera.set_pos(0.3759736716747284, 0.499371200799942, -1.889259696006775)
-        self.camera.setHpr(-16.5869, 82.7357, 30.1287)
+        self.camera.set_pos(0, 0, -2)
+        self.camera.look_at(0,0,0)
+        #self.camera.setHpr(-16.5869, 82.7357, 30.1287)
         
         # Add ambient light
         ambientLight = AmbientLight('ambientLight')
@@ -125,10 +126,12 @@ class BrownianBlender(ShowBase):
 
     def regen_face(self, task):
         if(not self.live_cam.isOpened()):
+            print("camera is closed")
             return
         
         success, image = self.live_cam.read()
         if(not success):
+            print("unable to read image")
             return
 
         image.flags.writeable = False
@@ -136,6 +139,7 @@ class BrownianBlender(ShowBase):
         results = self.face_mesh_processor.process(image)
 
         if(not results.multi_face_landmarks):
+            print("unable to process")
             return
             
         face_landmarks = results.multi_face_landmarks[0].landmark
@@ -155,9 +159,9 @@ class BrownianBlender(ShowBase):
         average_y = np.mean(landmark_y)
         average_z = np.mean(landmark_z)
 
-        centered_x = landmark_x 
-        centered_y = landmark_y 
-        centered_z = landmark_z 
+        centered_x = landmark_x - average_x  
+        centered_y = landmark_y - average_y
+        centered_z = landmark_z - average_z
 
 
         for i in range(len(centered_x)):
