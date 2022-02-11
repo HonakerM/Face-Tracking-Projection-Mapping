@@ -33,6 +33,8 @@ class BrownianBlender(ShowBase):
         ambientLightNP = self.render.attachNewNode(ambientLight)
         self.render.setLight(ambientLightNP)
 
+
+        
         #plight = DirectionalLight('plight')
         #plight.setShadowCaster(True, 512, 512)
         #plight.setColor(VBase4(1, 1, 1, 1))
@@ -51,7 +53,8 @@ class BrownianBlender(ShowBase):
         np.setDepthOffset(1)
         np.reparent_to(self.render)
 
-        self.accept("space", self.print_camera, [])
+        example_texture.jpg
+
 
 
 
@@ -59,12 +62,7 @@ class BrownianBlender(ShowBase):
         self.face_mesh_processor =  mp.solutions.face_mesh.FaceMesh( max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
         #create video capture
-        self.live_cam = cv2.VideoCapture(0)
-        print("Waiting for camera to open")
-        while(not self.live_cam.isOpened()):
-            pass
-        print("Camera on")
-
+        self.open_camera()
 
         # Start the task to interpolate the geometry each frame
         self.taskMgr.add(self.regen_face, 'generate_new_vertecies', sort = 5)
@@ -72,6 +70,10 @@ class BrownianBlender(ShowBase):
         #self.taskMgr.add(self.swap_maps, 'swap_geometry', sort = 5)
         #self.taskMgr.add(self.interpolate_maps, 'interpolate_geometry', sort = 10)
 
+        self.accept("space", self.print_camera, [])
+
+
+        #CAMERA CONTROLS
         self.yaw = 0
         self.pitch= 0
         self.accept("arrow_left", self.adjust_turning, [-1.0, 0.0])
@@ -83,6 +85,13 @@ class BrownianBlender(ShowBase):
         self.accept("s", self.adjust_loc, ["backward",1])
         self.accept("d", self.adjust_loc, ["right",1])
    
+    def open_camera(self):
+        self.live_cam = cv2.VideoCapture(0)
+        print("Waiting for camera to open")
+        while(not self.live_cam.isOpened()):
+            pass
+        print("Camera on")
+
     def print_camera(self):
         x = self.camera.getPos().getX()
         y = self.camera.getPos().getY()
@@ -127,12 +136,13 @@ class BrownianBlender(ShowBase):
     def regen_face(self, task):
         if(not self.live_cam.isOpened()):
             print("camera is closed")
-            return
+            self.open_camera()
+            return task.cont
         
         success, image = self.live_cam.read()
         if(not success):
             print("unable to read image")
-            return
+            return task.cont
 
         image.flags.writeable = False
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -140,7 +150,7 @@ class BrownianBlender(ShowBase):
 
         if(not results.multi_face_landmarks):
             print("unable to process")
-            return
+            return task.cont
             
         face_landmarks = results.multi_face_landmarks[0].landmark
 
