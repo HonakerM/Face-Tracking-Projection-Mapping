@@ -4,7 +4,7 @@ from panda3d.core import Geom, GeomNode, GeomVertexFormat, \
     GeomVertexData, GeomTriangles, GeomVertexWriter, GeomVertexReader, TextureStage, TexGenAttrib
 from panda3d.core import NodePath
 from panda3d.core import AmbientLight, PointLight, DirectionalLight
-from panda3d.core import VBase4, Vec3
+from panda3d.core import VBase4, Vec3, LVector3, Spotlight, PerspectiveLens 
 from direct.task import Task
 import sys
 import random
@@ -15,6 +15,12 @@ from assets.model_data import vertices, faces, uv_map
 import cv2
 import mediapipe as mp
 import numpy as np
+
+# You can't normalize inline so this is a helper function
+def normalized(*args):
+    myVec = LVector3(*args)
+    myVec.normalize()
+    return myVec
 
 class BrownianBlender(ShowBase):
     def __init__(self):
@@ -28,20 +34,23 @@ class BrownianBlender(ShowBase):
         #self.camera.setHpr(-16.5869, 82.7357, 30.1287)
         
         # Add ambient light
-        ambientLight = AmbientLight('ambientLight')
-        ambientLightNP = self.render.attachNewNode(ambientLight)
-        self.render.setLight(ambientLightNP)
+        #ambientLight = AmbientLight('ambientLight')
+        #ambientLight.setColor((0.3, 0.3, 0.3, 1))
+        #ambientLightNP = self.render.attachNewNode(ambientLight)
+        #self.render.setLight(ambientLightNP)
 
 
         
-        #plight = DirectionalLight('plight')
-        #plight.setShadowCaster(True, 512, 512)
-        #plight.setColor(VBase4(1, 1, 1, 1))
-        #self.plnp = self.render.attachNewNode(plight)
-        #self.plnp.setPos(0.3759736716747284, 0.499371200799942, -1.889259696006775)
-        #self.plnp.look_at(-16.5869, 82.7357, 30.1287)
-        #self.render.setLight(self.plnp)
-
+        # Light
+        light = Spotlight('light')
+        light.setShadowCaster(True, 512, 512)
+        lens = PerspectiveLens()
+        light.setLens(lens)
+        light_np = self.render.attachNewNode(light)
+        light_np.set_pos(0, 2, -20)
+        light_np.look_at(0, 0, 0)
+        # Model-light interaction
+        self.render.setLight(light_np)
 
         #adjust render settings
         self.render.setShaderAuto()
@@ -49,15 +58,17 @@ class BrownianBlender(ShowBase):
         # Create the geometry
         self.geom_node = self.create_geom()
         self.face_model_np = NodePath(self.geom_node)
+        self.face_model_np.setColor(0,0,1,1,1)
 
         #update rendering settings
         self.face_model_np.setDepthOffset(1)
         self.face_model_np.reparent_to(self.render)
 
 
+
         #udate texture settings
-        self.face_model_np.setTexGen(TextureStage.getDefault(), TexGenAttrib.MEyePosition)
-        #self.face_model_np.setTexProjector(TextureStage.getDefault(), self.render, self.face_model_np)
+        self.face_model_np.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
+        self.face_model_np.setTexProjector(TextureStage.getDefault(), self.render, self.face_model_np)
 
         #load texture
         model_texture = self.loader.loadTexture("img/example_texture.jpg")
@@ -90,6 +101,7 @@ class BrownianBlender(ShowBase):
         self.accept("a", self.adjust_loc, ["left",1])
         self.accept("s", self.adjust_loc, ["backward",1])
         self.accept("d", self.adjust_loc, ["right",1])
+        self.not_processing = False
    
     def open_camera(self):
         self.live_cam = cv2.VideoCapture(0)
@@ -99,26 +111,38 @@ class BrownianBlender(ShowBase):
         print("Camera on")
 
     def print_camera(self):
-        x = self.face_model_np.getPos().getX()
-        y = self.face_model_np.getPos().getY()
-        z = self.face_model_np.getPos().getZ()
-        print(x, y, z)
-        print(self.render.getTransform(self.face_model_np))
+        x = self.face_landmarks[4].x
+        y = self.face_landmarks[4].y
+        z = self.face_landmarks[4].z
+
+        #print(self.average_x)
+        #print(self.average_y)
+        #print(self.average_z)
+        #print(x-0.5,y,z)
+        print(np.degrees(self.refernce_yaw_angle), np.degrees(self.refernce_pitch_angle))
+        
+        #print(self.average_x, self.average_y, self.average_z)
+        #print(self.render.getTransform(self.face_model_np))
 
 
     def create_geom(self):
         
         #bpy.ops.mesh.primitive_cube_add()
-        vertex_format = GeomVertexFormat.getV3()
+        vertex_format = GeomVertexFormat.getV3n3()
         vdata = GeomVertexData('face_vertex_data', vertex_format, Geom.UHDynamic)
         vdata.setNumRows(len(vertices))
 
         #create vertex writer and add vertices
         vertex_writer = GeomVertexWriter(vdata, 'vertex')
+        normal_writer = GeomVertexWriter(vdata, 'normal')
+
         #texcoord_writer = GeomVertexWriter(vdata, 'texcoord')
         for i in range(len(vertices)):
             vertex_writer.addData3(*vertices[i])
-        #    texcoord_writer.addData2(*uv_map[i])
+            x = vertices[i][0]
+            y = vertices[i][1]
+            z = vertices[i][2]
+            normal_writer.addData3(normalized(2 * x - 1, 2 * y - 1, 2 * z - 1))
 
         geom = Geom(vdata)
 
@@ -158,33 +182,63 @@ class BrownianBlender(ShowBase):
         results = self.face_mesh_processor.process(image)
 
         if(not results.multi_face_landmarks):
-            print("unable to process")
+            if(not self.not_processing):
+                print("unable to process")
+                self.not_processing = True
+
             return task.cont
+
+        self.not_processing = False
             
-        face_landmarks = results.multi_face_landmarks[0].landmark
+        self.face_landmarks = results.multi_face_landmarks[0].landmark
 
         vertex_writer = GeomVertexWriter(self.vdata, 'vertex')
+        normal_writer = GeomVertexWriter(self.vdata, 'normal')
 
 
         landmark_x = np.array([])
         landmark_y = np.array([])
         landmark_z = np.array([])
-        for landmark in face_landmarks:
+        for landmark in self.face_landmarks:
             landmark_x = np.append(landmark_x, landmark.x)
             landmark_y = np.append(landmark_y, landmark.y)
             landmark_z = np.append(landmark_z, landmark.z)
 
-        average_x = np.mean(landmark_x)
-        average_y = np.mean(landmark_y)
-        average_z = np.mean(landmark_z)
 
-        centered_x = landmark_x - average_x  
-        centered_y = landmark_y - average_y
-        centered_z = landmark_z - average_z
+        #rotate first
 
 
-        for i in range(len(centered_x)):
-            vertex_writer.setData3f(centered_x[i], centered_y[i], centered_z[i])
+        #center locations in 3d space
+        self.average_x = np.mean(landmark_x)
+        self.average_y = np.mean(landmark_y)
+        self.average_z = np.mean(landmark_z)
+
+        centered_pos_x = landmark_x - self.average_x  
+        centered_pos_y = landmark_y - self.average_y
+        centered_pos_z = landmark_z - self.average_z
+
+
+        refernce_noose = {"x":centered_pos_x[4], "y":centered_pos_y[4], "z":centered_pos_z[4]}
+        self.refernce_yaw_angle = np.arctan(refernce_noose["x"]/refernce_noose["z"])
+        self.refernce_pitch_angle = np.arctan(refernce_noose["y"]/refernce_noose["z"])
+        
+        
+        yaw_centered_x = np.multiply(centered_pos_x, np.cos(self.refernce_yaw_angle)) - np.multiply(centered_pos_z, np.sin(self.refernce_yaw_angle))
+        yaw_centered_y = centered_pos_y
+        yaw_centered_z = np.multiply(centered_pos_z, np.cos(self.refernce_yaw_angle)) + np.multiply(centered_pos_x, np.sin(self.refernce_yaw_angle))
+
+        #pitch_centered_x = yaw_centered_x
+        #pitch_centered_y = np.multiply(yaw_centered_y, np.cos(self.refernce_pitch_angle)) + np.multiply(yaw_centered_z, np.sin(self.refernce_pitch_angle))
+        #pitch_centered_z = np.multiply(yaw_centered_z, np.cos(self.refernce_pitch_angle)) - np.multiply(yaw_centered_y, np.sin(self.refernce_pitch_angle))
+
+        
+        for i in range(len(vertices)):
+
+            x = centered_pos_x[i]
+            y = centered_pos_y[i]
+            z = centered_pos_z[i]
+            vertex_writer.addData3(x, y, z)
+            normal_writer.addData3(normalized(2 * x - 1, 2 * y - 1, 2 * z - 1))
 
 
         return task.cont

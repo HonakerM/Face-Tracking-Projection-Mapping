@@ -4,13 +4,20 @@ from panda3d.core import Geom, GeomNode, GeomVertexFormat, \
     GeomVertexData, GeomTriangles, GeomVertexWriter, GeomVertexReader
 from panda3d.core import NodePath
 from panda3d.core import PointLight
-from panda3d.core import VBase4, Vec3
+from panda3d.core import VBase4, Vec3, LVector3
 from direct.task import Task
 import sys
 import random
 from math import sqrt
 from model_data import vertices, faces
 
+
+
+# You can't normalize inline so this is a helper function
+def normalized(*args):
+    myVec = LVector3(*args)
+    myVec.normalize()
+    return myVec
 
 
 class BrownianBlender(ShowBase):

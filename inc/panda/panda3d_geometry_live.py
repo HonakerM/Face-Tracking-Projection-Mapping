@@ -51,6 +51,10 @@ class BrownianBlender(ShowBase):
         np.setDepthOffset(1)
         np.reparent_to(self.render)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3546da3a7f35d18394568e140f29b29499a04a93
 
 
 
