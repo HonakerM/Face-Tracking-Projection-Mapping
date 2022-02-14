@@ -53,7 +53,6 @@ class BrownianBlender(ShowBase):
         np.setDepthOffset(1)
         np.reparent_to(self.render)
 
-        example_texture.jpg
 
 
 
