@@ -4,7 +4,7 @@ from panda3d.core import Geom, GeomNode, GeomVertexFormat, \
     GeomVertexData, GeomTriangles, GeomVertexWriter, GeomVertexReader, TextureStage, TexGenAttrib
 from panda3d.core import NodePath
 from panda3d.core import AmbientLight, PointLight, DirectionalLight
-from panda3d.core import VBase4, Vec3, LVector3, Spotlight, PerspectiveLens 
+from panda3d.core import VBase4, Vec3, LVector3, Spotlight, PerspectiveLens , TransformState
 from direct.task import Task
 import sys
 import random
@@ -70,7 +70,7 @@ class BrownianBlender(ShowBase):
         self.face_model_np.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
 
         #load texture
-        model_texture = self.loader.loadTexture("img/example_texture.jpg")
+        model_texture = self.loader.loadTexture("img/example_texture_small.png")
         self.face_model_np.setTexture(model_texture)
 
 
@@ -208,13 +208,13 @@ class BrownianBlender(ShowBase):
 
 
         #center locations in 3d space
-        self.average_x = np.mean(landmark_x)
-        self.average_y = np.mean(landmark_y)
-        self.average_z = np.mean(landmark_z)
+        self.average_x = np.mean(landmark_x, dtype= np.float64 )
+        self.average_y = np.mean(landmark_y, dtype= np.float64 )
+        self.average_z = np.mean(landmark_z, dtype= np.float64 )
 
-        centered_pos_x = landmark_x - self.average_x  
-        centered_pos_y = landmark_y - self.average_y
-        centered_pos_z = landmark_z - self.average_z
+        centered_pos_x = landmark_x - np.abs(self.average_x ) 
+        centered_pos_y = landmark_y - np.abs(self.average_y)
+        centered_pos_z = landmark_z - np.abs(self.average_z)
 
 
         refernce_nose_vertex = LVector3(centered_pos_x[4],centered_pos_y[4],centered_pos_z[4])
@@ -228,10 +228,12 @@ class BrownianBlender(ShowBase):
         
         temp_node_path = NodePath("temp")
         temp_node_path.setPosHpr(refernce_nose_vertex, refernce_nose_hpr)
-        temp_node_path.set_pos(refernce_nose_vertex.getX(), refernce_nose_vertex.getY(), refernce_nose_vertex.getZ())
 
 
-        self.face_model_np.setTexTransform(TextureStage.getDefault(), self.render.getTransform(temp_node_path))
+        #self.face_model_np.setTexTransform(TextureStage.getDefault(), self.render.getTransform(temp_node_path))
+        self.face_model_np.setTexTransform(TextureStage.getDefault(), TransformState.makeHpr((0, 0, 0)))
+        #self.face_model_np.setTexOffset(TextureStage.getDefault(), 10,10)
+        #self.face_model_np.setTexRotate(TextureStage.getDefault(), 90)
 
         #self.face_model_np.setTexProjector(TextureStage.getDefault(), self.render, self.face_model_np)
 
