@@ -58,7 +58,7 @@ class BrownianBlender(ShowBase):
         # Create the geometry
         self.geom_node = self.create_geom()
         self.face_model_np = NodePath(self.geom_node)
-        self.face_model_np.setColor(0,0,1,1,1)
+        self.face_model_np.setColor(1,1,1,1,1)
 
         #update rendering settings
         self.face_model_np.setDepthOffset(1)
@@ -68,7 +68,6 @@ class BrownianBlender(ShowBase):
 
         #udate texture settings
         self.face_model_np.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
-        self.face_model_np.setTexProjector(TextureStage.getDefault(), self.render, self.face_model_np)
 
         #load texture
         model_texture = self.loader.loadTexture("img/example_texture.jpg")
@@ -218,14 +217,27 @@ class BrownianBlender(ShowBase):
         centered_pos_z = landmark_z - self.average_z
 
 
-        refernce_noose = {"x":centered_pos_x[4], "y":centered_pos_y[4], "z":centered_pos_z[4]}
-        self.refernce_yaw_angle = np.arctan(refernce_noose["x"]/refernce_noose["z"])
-        self.refernce_pitch_angle = np.arctan(refernce_noose["y"]/refernce_noose["z"])
+        refernce_nose_vertex = LVector3(centered_pos_x[4],centered_pos_y[4],centered_pos_z[4])
+        refernce_nose_normal = normalized(2 * refernce_nose_vertex.getX() - 1, 2 * refernce_nose_vertex.getY() - 1, 2 * refernce_nose_vertex.getZ() - 1)
+
+        refernce_nose_hpr = refernce_nose_normal.angleRad(LVector3.zero())
+
+
+        self.refernce_yaw_angle = np.arctan(refernce_nose_vertex.getX()/refernce_nose_vertex.getZ())
+        self.refernce_pitch_angle = np.arctan(refernce_nose_vertex.getY()/refernce_nose_vertex.getZ())
         
-        
-        yaw_centered_x = np.multiply(centered_pos_x, np.cos(self.refernce_yaw_angle)) - np.multiply(centered_pos_z, np.sin(self.refernce_yaw_angle))
-        yaw_centered_y = centered_pos_y
-        yaw_centered_z = np.multiply(centered_pos_z, np.cos(self.refernce_yaw_angle)) + np.multiply(centered_pos_x, np.sin(self.refernce_yaw_angle))
+        temp_node_path = NodePath("temp")
+        temp_node_path.setPosHpr(refernce_nose_vertex, refernce_nose_hpr)
+        temp_node_path.set_pos(refernce_nose_vertex.getX(), refernce_nose_vertex.getY(), refernce_nose_vertex.getZ())
+
+
+        self.face_model_np.setTexTransform(TextureStage.getDefault(), self.render.getTransform(temp_node_path))
+
+        #self.face_model_np.setTexProjector(TextureStage.getDefault(), self.render, self.face_model_np)
+
+        #yaw_centered_x = np.multiply(centered_pos_x, np.cos(self.refernce_yaw_angle)) - np.multiply(centered_pos_z, np.sin(self.refernce_yaw_angle))
+        #yaw_centered_y = centered_pos_y
+        #yaw_centered_z = np.multiply(centered_pos_z, np.cos(self.refernce_yaw_angle)) + np.multiply(centered_pos_x, np.sin(self.refernce_yaw_angle))
 
         #pitch_centered_x = yaw_centered_x
         #pitch_centered_y = np.multiply(yaw_centered_y, np.cos(self.refernce_pitch_angle)) + np.multiply(yaw_centered_z, np.sin(self.refernce_pitch_angle))
